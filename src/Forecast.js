@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 const Forecast = () => {
-    const [forecast, setForecast] = useState({
+    const [forecast] = useState({
         times: ['9am', '10am', '11am'],
         temps: [3, 2, 1],
         rel_humids: [10, 20, 30],
