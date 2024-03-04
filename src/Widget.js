@@ -23,11 +23,22 @@ const RelativeHumidity = () => {
     )
 }
 
+const AbsoluteHumidity = () => {
+    const [value, setValue] = useState(5);
+    return (
+        <>
+        <Form.Label>Absolute Humidity: {Number(value).toFixed(2)}g/kg</Form.Label>
+        <Form.Range min="0" max="20" step="0.5" value={value} onChange={e => setValue(e.target.value)}/>
+        </>
+    )
+}
+
 const Widget = () => {
     return (
     <Container>
         <Temperature/>
         <RelativeHumidity/>
+        <AbsoluteHumidity/>
     </Container>
     )
 }
