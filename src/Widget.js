@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 
 const Temperature = () => {
@@ -24,10 +25,10 @@ const RelativeHumidity = () => {
 
 const Widget = () => {
     return (
-        <>
+    <Container>
         <Temperature/>
         <RelativeHumidity/>
-        </>
+    </Container>
     )
 }
 
