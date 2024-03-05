@@ -3,34 +3,41 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 
 const Widget = () => {
-    const [locked, setLocked] = useState("temp");
+    const [locked, setLocked] = useState("abs_humid");
     const [temperature, setTemperature] = useState(10);
     const [relativeHumidity, setRelativeHumidity] = useState(50);
-    const [absoluteHumidity, setAbsoluteHumidity] = useState(10);
+    const [absoluteHumidity, setAbsoluteHumidity] = useState(calculateAbsoluteHumidity(temperature, relativeHumidity));
+
+    function calculateAbsoluteHumidity(temperature, relativeHumidity) {
+        return temperature * (relativeHumidity / 100);
+    }
+
+    function calculateValue(absoluteHumidity, relativeHumidity, temperature) {
+        // Note: This calculation is completely wrong!
+        if (locked === "temp") {
+            setTemperature(absoluteHumidity * relativeHumidity / 100);
+        }
+        if (locked === "rel_humid") {
+            setRelativeHumidity(100 * absoluteHumidity / temperature);
+        }
+        if (locked === "abs_humid") {
+            setAbsoluteHumidity(calculateAbsoluteHumidity(temperature, relativeHumidity));
+        }
+    }
 
     function updateTemperature(e) {
         setTemperature(e.target.value);
-        calculateAbsoluteHumidity(e.target.value, relativeHumidity);
+        calculateValue(absoluteHumidity, relativeHumidity, e.target.value);
     }
 
     function updateRelativeHumidity(e) {
         setRelativeHumidity(e.target.value);
-        calculateAbsoluteHumidity(temperature, e.target.value);
+        calculateValue(absoluteHumidity, e.target.value, temperature);
     }
 
     function updateAbsoluteHumidity(e) {
         setAbsoluteHumidity(e.target.value);
-        calculateRelativeHumidity(temperature, e.target.value)
-    }
-
-    function calculateAbsoluteHumidity(temperature, relativeHumidity) {
-        // Note: This calculation is completely wrong!
-        setAbsoluteHumidity(temperature * (relativeHumidity / 100));
-    }
-
-    function calculateRelativeHumidity(temperature, absoluteHumidity) {
-        // Note: This calculation is completely wrong!
-        setRelativeHumidity(absoluteHumidity * 100 / temperature);
+        calculateValue(e.target.value, relativeHumidity, temperature);
     }
 
     return (
