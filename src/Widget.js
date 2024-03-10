@@ -2,23 +2,35 @@ import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 
+// J / (kg * K)
+const specific_gas = 461.5;
+
 const Widget = () => {
     const [locked, setLocked] = useState("abs_humid");
     const [temperature, setTemperature] = useState(10);
     const [relativeHumidity, setRelativeHumidity] = useState(50);
     const [absoluteHumidity, setAbsoluteHumidity] = useState(calculateAbsoluteHumidity(temperature, relativeHumidity));
 
-    function calculateAbsoluteHumidity(temperature, relativeHumidity) {
+    function saturationPressure(temperature) {
         // https://journals.ametsoc.org/view/journals/mwre/108/7/1520-0493_1980_108_1046_tcoept_2_0_co_2.xml?tab_body=pdf
-        // saturation pressure
         // Pa
-        const saturation_pressure = 6.112 * Math.exp(17.67 * temperature / (temperature + 243.5)) * 100;  // Pa
-        const specific_gas = 461.5;
+        return 6.112 * Math.exp(17.67 * temperature / (temperature + 243.5)) * 100;
+    }
+
+    function kelvin(temperature) {
+        return temperature + 273.15;
+    }
+
+    function calculateAbsoluteHumidity(temperature, relativeHumidity) {
         // pV = mRT
         // kg/m^3
-        const abs_humidity = (relativeHumidity / 100) * saturation_pressure / (specific_gas * (temperature + 273.15));
+        const abs_humidity = (relativeHumidity / 100) * saturationPressure(temperature) / (specific_gas * kelvin(temperature));
         // g/m^3
         return 1000 * abs_humidity;
+    }
+
+    function calculateRelativeHumidity(absoluteHumidity, temperature) {
+        return 100 * absoluteHumidity * specific_gas * kelvin(temperature) / (1000 * saturationPressure(temperature));
     }
 
     function calculateValue(absoluteHumidity, relativeHumidity, temperature) {
@@ -27,7 +39,7 @@ const Widget = () => {
             setTemperature(absoluteHumidity * relativeHumidity / 100);
         }
         if (locked === "rel_humid") {
-            setRelativeHumidity(100 * absoluteHumidity / temperature);
+            setRelativeHumidity(calculateRelativeHumidity(absoluteHumidity, temperature));
         }
         if (locked === "abs_humid") {
             setAbsoluteHumidity(calculateAbsoluteHumidity(temperature, relativeHumidity));
