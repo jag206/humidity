@@ -9,7 +9,16 @@ const Widget = () => {
     const [absoluteHumidity, setAbsoluteHumidity] = useState(calculateAbsoluteHumidity(temperature, relativeHumidity));
 
     function calculateAbsoluteHumidity(temperature, relativeHumidity) {
-        return temperature * (relativeHumidity / 100);
+        // https://journals.ametsoc.org/view/journals/mwre/108/7/1520-0493_1980_108_1046_tcoept_2_0_co_2.xml?tab_body=pdf
+        // saturation pressure
+        // Pa
+        const saturation_pressure = 6.112 * Math.exp(17.67 * temperature / (temperature + 243.5)) * 100;  // Pa
+        const specific_gas = 461.5;
+        // pV = mRT
+        // kg/m^3
+        const abs_humidity = (relativeHumidity / 100) * saturation_pressure / (specific_gas * (temperature + 273.15));
+        // g/m^3
+        return 1000 * abs_humidity;
     }
 
     function calculateValue(absoluteHumidity, relativeHumidity, temperature) {
@@ -26,18 +35,21 @@ const Widget = () => {
     }
 
     function updateTemperature(e) {
-        setTemperature(e.target.value);
-        calculateValue(absoluteHumidity, relativeHumidity, e.target.value);
+        const T = parseFloat(e.target.value);
+        setTemperature(T);
+        calculateValue(absoluteHumidity, relativeHumidity, T);
     }
 
     function updateRelativeHumidity(e) {
-        setRelativeHumidity(e.target.value);
-        calculateValue(absoluteHumidity, e.target.value, temperature);
+        const RH = parseFloat(e.target.value);
+        setRelativeHumidity(RH);
+        calculateValue(absoluteHumidity, RH, temperature);
     }
 
     function updateAbsoluteHumidity(e) {
-        setAbsoluteHumidity(e.target.value);
-        calculateValue(e.target.value, relativeHumidity, temperature);
+        const AH = parseFloat(e.target.value);
+        setAbsoluteHumidity(AH);
+        calculateValue(AH, relativeHumidity, temperature);
     }
 
     return (
@@ -60,7 +72,7 @@ const Widget = () => {
             value={relativeHumidity}
             onChange={updateRelativeHumidity}
         />
-        <Form.Label>Absolute Humidity: {Number(absoluteHumidity).toFixed(2)}g/kg</Form.Label>
+        <Form.Label>Absolute Humidity: {Number(absoluteHumidity).toFixed(2)}g/m<sup>3</sup></Form.Label>
         <Form.Range
             {...{"disabled":locked==="abs_humid"}}
             min="0"
