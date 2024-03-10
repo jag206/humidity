@@ -34,10 +34,6 @@ const Widget = () => {
     }
 
     function calculateValue(absoluteHumidity, relativeHumidity, temperature) {
-        // Note: This calculation is completely wrong!
-        if (locked === "temp") {
-            setTemperature(absoluteHumidity * relativeHumidity / 100);
-        }
         if (locked === "rel_humid") {
             setRelativeHumidity(calculateRelativeHumidity(absoluteHumidity, temperature));
         }
@@ -94,16 +90,8 @@ const Widget = () => {
 
             onChange={updateAbsoluteHumidity}
         />
+        <strong>Lock</strong>:
         <div key="tmp" className="mb-3">
-          <Form.Check
-            inline
-            {...{"checked":locked==="temp"}}
-            label="Temperature"
-            name="lock"
-            type="radio"
-            id="lock-temp"
-            onChange={e => {setLocked("temp")}}
-          />
           <Form.Check
             inline
             {...{"checked":locked==="rel_humid"}}
@@ -123,7 +111,6 @@ const Widget = () => {
             onChange={e => {setLocked("abs_humid")}}
           />
         </div>
-        <p><strong>Note that the above calculation is completely inaccurate</strong></p>
     </Container>
     )
 }
